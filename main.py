@@ -44,7 +44,7 @@ class WeatherApp(QWidget):
         self.description_label.setObjectName("description_label")
 
         self.setStyleSheet("""
-            QLabel,QPushButton{
+            QLabel, QPushButton{
                             font-family: calibri;
                             }
             QLabel#city_label{
@@ -85,37 +85,54 @@ class WeatherApp(QWidget):
             if data["cod"] == 200:
                 self.dispaly_weather(data)
 
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as http_error:
             match response.status_code:
                 case 400:
-                    print("Bad request\nPlease check your input")
+                    self.dispaly_error("Bad request:\nPlease check your input")
                 case 401:
-                    print("Unauthorized\nInvalid API key")
+                    self.dispaly_error("Unauthorized:\nInvalid API key")
                 case 403:
-                    print("Forbidden\nAccess is denied")
+                    self.dispaly_error("Forbidden:\nAccess is denied")
                 case 404:
-                    print("Not found\nCity not found")
+                    self.dispaly_error("Not found:\nCity not found")
                 case 500:
-                    print("Bad request\nPlease check your input")
+                    self.dispaly_error("Internal Server Error:\nPlease try again later")
                 case 502:
-                    print("Bad request\nPlease check your input")
+                    self.dispaly_error("Bad Gateway:\nInvalid response from the server")
                 case 503:
-                    print("Bad request\nPlease check your input")
+                    self.dispaly_error("Server Unavailable:\n Server is down")
                 case 504:
-                    print("Bad request\nPlease check your input")
+                    self.dispaly_error("Gateway Timeout:\nNo response from the server")
+                case _:
+                    self.dispaly_error(f"HTTP error occured:\n{http_error}")
 
-        except requests.exceptions.RequestException:
-            pass
+        except requests.exceptions.ConnectionError:
+            self.dispaly_error("Connection Error:\nCheck your internet connection")
+        
+        except requests.exceptions.Timeout:
+            self.dispaly_error("Timeout Error:\nThe request timed out")
+
+        except requests.exceptions.TooManyRedirects:
+            self.dispaly_error("Too many Redirects:\nCheck the URL")
+
+
+        except requests.exceptions.RequestException as req_error:
+            self.dispaly_error(f"Request Error:\n{req_error}")
 
 
     def dispaly_error(self, message):
-        pass
+        self.temperature_label.setStyleSheet("font-size: 25px;")
+        self.temperature_label.setText(message)
 
     def dispaly_weather(self, data):
-        print(data)
+        self.temperature_label.setStyleSheet("font-size: 55px;")
+        temperature_k = data["main"]["temp"]
+        temperature_c = temperature_k - 273.15
+        temperature_f = (temperature_k * 9/5) - 549.67
+        weather_description = data["weather"][0]["description"]
 
-
-
+        self.temperature_label.setText(f"{temperature_c:.0f}°C")
+        self.description_label.setText(weather_description)
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
