@@ -124,6 +124,8 @@ class WeatherApp(QWidget):
     def dispaly_error(self, message):
         self.temperature_label.setStyleSheet("font-size: 25px;")
         self.temperature_label.setText(message)
+        self.emoji_label.clear()
+        self.description_label.clear()
 
     def dispaly_weather(self, data):
         self.temperature_label.setStyleSheet("font-size: 55px;")
