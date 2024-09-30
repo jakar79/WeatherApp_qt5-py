@@ -4,7 +4,9 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QLabel,
                                 QLineEdit, QPushButton, QVBoxLayout)
 
 from PyQt5.QtCore import Qt
-    
+from requests import Response
+
+
 class WeatherApp(QWidget):
     def __init__(self):
         super().__init__()
@@ -14,10 +16,10 @@ class WeatherApp(QWidget):
         self.temperature_label = QLabel(self)
         self.emoji_label = QLabel(self)
         self.description_label = QLabel(self)
-        self.initUI()
+        self.init_ui()
         
 
-    def initUI(self):
+    def init_ui(self):
         self.setWindowTitle("Weather App")
 
         vbox = QVBoxLayout()
@@ -37,6 +39,7 @@ class WeatherApp(QWidget):
         self.emoji_label.setAlignment(Qt.AlignCenter)
         self.description_label.setAlignment(Qt.AlignCenter)
 
+##---Styling Widget:
         self.city_label.setObjectName("city_label")
         self.city_input.setObjectName("city_input")
         self.get_weather_button.setObjectName("get_weather_button")
@@ -74,6 +77,7 @@ class WeatherApp(QWidget):
         self.get_weather_button.clicked.connect(self.get_weather)
 
     def get_weather(self):
+
         api_key= "1d7233dc620a31e5a7769b3ce0fe8238"
         city = self.city_input.text()
         url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}"
@@ -131,7 +135,7 @@ class WeatherApp(QWidget):
         self.temperature_label.setStyleSheet("font-size: 55px;")
         temperature_k = data["main"]["temp"]
         temperature_c = temperature_k - 273.15
-        temperature_f = (temperature_k * 9/5) - 549.67
+        ##temperature_f = (temperature_k * 9/5) - 549.67
         weather_id = data["weather"][0]["id"]
         weather_description = data["weather"][0]["description"]
 
